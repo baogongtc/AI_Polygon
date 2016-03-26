@@ -432,8 +432,17 @@ public class PolygonView extends ImageView {
         invalidate();
     }
 
-    private Point attractCenter(int x, int y) {
+    //四个都初始化后需要手动调用 invalidate 刷新
+    public void initPolygon(Polygon polygon, List<Point> srcPoints) {
+        if (Shape.RECT == mShape) {
+            polygon.setState(Polygon.State.INIT);
+            for (int i = 0; i < 4; i++) {
+                polygon.setPoint(i, srcPoints.get(i));
+            }
+        }
+    }
 
+    private Point attractCenter(int x, int y) {
         if (Shape.RECT == mShape) {
             for (int polygonIndex = 0; polygonIndex < mPolygons.size(); polygonIndex++) {
                 Point ap = MathUtil.averagePolygon(mPolygons.get(polygonIndex).getPoints());
@@ -461,15 +470,12 @@ public class PolygonView extends ImageView {
     }
 
     private Point attractCircleCenter(int x, int y) {
-
         for (int polygonIndex = 0; polygonIndex < mPolygons.size(); polygonIndex++) {
             if (100 > (Math.max(Math.abs(x - mCenterX), Math.abs(y - mCenterY)))) {
                 mCurrentActivePolygon = mPolygons.get(polygonIndex);
                 return new Point((int) mCenterX, (int) mCenterY);
-
             }
         }
-
         return null;
     }
 
@@ -483,12 +489,10 @@ public class PolygonView extends ImageView {
                 }
             }
         }
-
         return null;
     }
 
     private RectF getBitmapRect() {
-
         final Drawable drawable = getDrawable();
         if (drawable == null) {
             return new RectF();
